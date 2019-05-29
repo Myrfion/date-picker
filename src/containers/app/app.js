@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import SmallPicker from '../small-picker';
 import PopUp from '../pop-up';
 import { connect } from 'react-redux';
-import { generateCalendar, selectRange } from '../../actions/actions';
+import { fetchLifeTime } from '../../actions/actions';
+//import { selectRange } from '../../actions/actions';
 
 class App extends Component {
   componentWillMount = () => {
-    this.props.generateCalendar();
-    this.props.selectRange('Today');
+    this.props.fetchLifeTime();
   };
   render() {
     return (
@@ -25,5 +25,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { generateCalendar, selectRange }
+  { fetchLifeTime }
 )(App);

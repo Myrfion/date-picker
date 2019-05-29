@@ -1,0 +1,73 @@
+.calendars-container {
+  display: flex;
+}
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+.default-btn {
+  background: white;
+  border: none;
+}
+.apply-btn {
+  color: #f7ad17;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+.DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
+  background-color: #f8c55e !important;
+  color: white !important;
+}
+.Selectable .DayPicker-Day {
+  border-radius: 0 !important;
+}
+.Selectable .DayPicker-Day--start {
+  border-top-left-radius: 20% !important;
+  border-bottom-left-radius: 20% !important;
+  background: #f7ad17 !important;
+}
+.Selectable .DayPicker-Day--end {
+  border-top-right-radius: 20% !important;
+  border-bottom-right-radius: 20% !important;
+  background: #f7ad17 !important;
+}
+
+.DayPicker {
+  display: flex;
+  font-size: 2.5rem;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  .DayPicker-Caption {
+    div {
+      margin: 0 auto;
+    }
+  }
+
+  .DayPicker-Months {
+    display: flex;
+    flex-direction: row !important;
+    margin: 0;
+    padding: 0;
+    .DayPicker-Week {
+      //display: inline-flex !important;
+      line-height: 30px !important;
+      .DayPicker-Day--outside {
+        background: white !important;
+      }
+      .DayPicker-Day {
+        margin-top: 10px !important;
+        height: 40px;
+        width: 40px;
+      }
+    }
+  }
+
+  .DayPicker-Day--today {
+    font-weight: 400 !important;
+    color: black;
+  }
+}

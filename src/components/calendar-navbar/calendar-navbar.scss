@@ -1,0 +1,14 @@
+.calendar-navbar {
+  width: calc(100% - 2rem);
+  display: flex !important;
+  justify-content: space-between;
+  margin-left: 1rem;
+  margin-bottom: -2.5rem;
+  .left-group,
+  .right-group {
+    z-index: 10;
+  }
+  img {
+    cursor: pointer;
+  }
+}

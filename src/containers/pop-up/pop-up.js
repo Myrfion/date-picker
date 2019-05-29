@@ -1,14 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import propTypes from 'prop-types';
 
 import RangeList from '../range-list';
-import LeftSideContainer from '../left-side-container/left-side-container';
+import LeftSideContainer from '../left-side-container';
 
 import './pop-up.scss';
 
-const PopUp = ({ is_pop_up_showed }) => {
-  if (is_pop_up_showed) {
+const PopUp = ({ isPopUpShowed }) => {
+  if (isPopUpShowed) {
     return (
       <div className="pop-up">
         <LeftSideContainer />
@@ -20,13 +19,9 @@ const PopUp = ({ is_pop_up_showed }) => {
   }
 };
 
-PopUp.propTypes = {
-  is_pop_up_showed: propTypes.bool
-};
-
 const mapStateToProps = state => {
   return {
-    is_pop_up_showed: state.is_pop_up_showed
+    isPopUpShowed: state.isPopUpShowed
   };
 };
 

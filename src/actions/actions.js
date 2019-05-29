@@ -1,271 +1,45 @@
 import moment from 'moment';
+import { DateUtils } from 'react-day-picker';
+
 import store from '../store';
 import {
-  GENERATE_CALENDAR,
-  SELECT_DAY,
-  UPDATE_SELECTED_START,
-  UPDATE_SELECTED_FINISH,
-  SELECT_RANGE,
   FETCH_LIFE_TIME_START,
   FETCH_LIFE_TIME_SUCCESS,
-  CLEAN_SELECTION,
   APPLY_CALENDAR,
-  CHANGE_SHOWED_MONTH,
-  CHANGE_SHOWED_MONTH_ERROR,
-  SELECT_DAY_ERROR,
   TOGGLE_POP_UP,
-  CLEAN_SUCCESS
+  UPDATE_RANGE,
+  UPDATE_RANGE_ERROR,
+  SET_SNIPPET,
+  CLEAN_SELECTION,
+  UDPATE_PREV_RANGE
 } from './names';
 
 const start_sales_url = 'https://staging.sellermetrix.com/api/test/start_of_sales?marketplace=usa';
 
-export const generateCalendar = (start = store.getState().life_time) => {
-  const selected_start = store.getState().current_selected_start;
-
-  const selected_finish =
-    store.getState().current_selected_finish !== 0
-      ? store.getState().current_selected_finish
-      : selected_start;
-
-  let iterator = new moment(start);
-  iterator = iterator.startOf('month');
-  let today = moment();
-
-  let month = {
-    title: iterator.format('MMMM YYYY'),
-    days: [],
-    offset: iterator.day() - 1
-  };
-  let payload = [];
-  const compate_date = today
-    .add(1, 'months')
-    .startOf('month')
-    .format('MMMM Do YYYY');
-  while (iterator.format('MMMM Do YYYY') !== compate_date) {
-    if (iterator.format('MMMM YYYY') !== month.title) {
-      payload.push(month);
-      month = {
-        title: iterator.format('MMMM YYYY'),
-        days: [],
-        offset: iterator.day() - 1
-      };
-    }
-
-    month.days.push({
-      num: iterator.date(),
-      active:
-        iterator.unix() >= selected_start && iterator.unix() <= selected_finish ? true : false,
-      unix_time: iterator.unix(),
-      is_first: selected_start == iterator.unix() ? true : false,
-      is_last: selected_finish == iterator.unix() ? true : false
-    });
-    //console.log(compate_date,iterator)
-    iterator.add(1, 'days');
-  }
-  payload.push(month);
+export const updatePrevRange = () => {
   return {
-    type: GENERATE_CALENDAR,
-    payload
+    type: UDPATE_PREV_RANGE
   };
 };
-export const selectDay = unix_time => {
-  const { dispatch } = store;
-  const state = store.getState();
-  const { current_selected_finish, current_selected_start } = state;
+
+export const updateRange = day => {
+  const day_unix = moment(day).unix();
+  const payload = DateUtils.addDayToRange(day, store.getState().range);
   if (
-    unix_time >= moment(store.getState().life_time).unix() &&
-    unix_time <=
-      moment()
-        .startOf('day')
-        .unix()
+    moment()
+      .add(1, 'days')
+      .startOf('day')
+      .unix() >= day_unix &&
+    moment(store.getState().lifeTime).unix() <= day_unix &&
+    (payload.from || payload.to)
   ) {
-    if (state.current_selected_start === 0) {
-      dispatch(updateSelectedStart(unix_time));
-      dispatch(updateSelectedFinish(unix_time));
-    } else {
-      if (unix_time > current_selected_start && unix_time < current_selected_finish) {
-        dispatch(updateSelectedStart(unix_time));
-      } else if (unix_time > current_selected_finish) {
-        dispatch(updateSelectedStart(current_selected_finish));
-        dispatch(updateSelectedFinish(unix_time));
-      } else if (unix_time < current_selected_finish) {
-        dispatch(updateSelectedFinish(current_selected_start));
-        dispatch(updateSelectedStart(unix_time));
-      }
-    }
     return {
-      type: SELECT_DAY
+      type: UPDATE_RANGE,
+      payload
     };
   }
   return {
-    type: SELECT_DAY_ERROR
-  };
-};
-
-export const selectRange = type => {
-  const { dispatch } = store;
-
-  switch (type) {
-    case 'Today':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      break;
-    case 'Yersterday':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .startOf('day')
-            .subtract(1, 'days')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .subtract(1, 'days')
-            .unix()
-        )
-      );
-      break;
-    case 'Last 7 days':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .subtract(1, 'weeks')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      break;
-    case 'Last 30 days':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .subtract(1, 'months')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      break;
-    case 'This Month':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .startOf('month')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      break;
-    case 'This Month':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .startOf('month')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      break;
-    case 'Last Month':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .subtract(1, 'months')
-            .startOf('month')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .subtract(1, 'months')
-            .endOf('month')
-            .unix()
-        )
-      );
-      break;
-    case 'This Year':
-      dispatch(
-        updateSelectedStart(
-          moment()
-            .startOf('year')
-            .unix()
-        )
-      );
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      break;
-    case 'Lifetime':
-      dispatch(updateSelectedStart(moment(store.getState().life_time).unix()));
-      dispatch(
-        updateSelectedFinish(
-          moment()
-            .startOf('day')
-            .unix()
-        )
-      );
-      break;
-  }
-  dispatch(generateCalendar());
-  return {
-    type: SELECT_RANGE
-  };
-};
-
-const updateSelectedStart = payload => {
-  return {
-    type: UPDATE_SELECTED_START,
-    payload
-  };
-};
-
-const updateSelectedFinish = payload => {
-  return {
-    type: UPDATE_SELECTED_FINISH,
-    payload
+    type: UPDATE_RANGE_ERROR
   };
 };
 
@@ -276,7 +50,6 @@ export const fetchLifeTime = () => {
     cache: 'no-cache',
     headers: {
       'Content-Type': 'application/json'
-      // 'Content-Type': 'application/x-www-form-urlencoded',
     }
   })
     .then(resp => resp.json())
@@ -295,41 +68,88 @@ export const fetchLifeTime = () => {
   };
 };
 
-export const clearSelection = () => {
-  store.dispatch({
-    type: CLEAN_SELECTION
-  });
-  store.dispatch(generateCalendar());
+export const togglePopUp = () => {
   return {
-    type: CLEAN_SUCCESS
+    type: TOGGLE_POP_UP
   };
 };
 
 export const applyCalendar = () => {
-  const range_start = store.getState().saved_start;
-  const range_finish = store.getState().saved_finish;
-  alert('Range Start: ' + moment.unix(range_start).format('MMMM Do YYYY'));
-  alert('Range Finish: ' + moment.unix(range_finish).format('MMMM Do YYYY'));
+  alert('This action was called due to ui of other components should change with the new range');
   return {
     type: APPLY_CALENDAR
   };
 };
 
-export const changeShowedMonth = n => {
-  const payload = store.getState().current_showed_month - n;
-  if (payload > 0 && payload < store.getState().monthes.length) {
-    return {
-      type: CHANGE_SHOWED_MONTH,
-      payload
-    };
-  }
+export const updateRangeToToday = date => {
+  const { dispatch } = store;
+
+  dispatch(updateRange(moment().toDate()));
+  dispatch(updateRange(date));
+};
+
+export const cleanSelection = () => {
   return {
-    type: CHANGE_SHOWED_MONTH_ERROR
+    type: CLEAN_SELECTION
   };
 };
 
-export const togglePopUp = () => {
+export const setSnippet = payload => {
+  switch (payload) {
+    case 'Today':
+      updateRangeToToday(moment().toDate(), moment().toDate());
+      break;
+    case 'Yersterday':
+      store.dispatch(
+        updateRange(
+          moment()
+            .subtract(1, 'days')
+            .toDate()
+        )
+      );
+      store.dispatch(
+        updateRange(
+          moment()
+            .subtract(1, 'days')
+            .toDate()
+        )
+      );
+      break;
+    case 'Last 7 days':
+      updateRangeToToday(
+        moment()
+          .subtract(1, 'week')
+          .toDate()
+      );
+      break;
+    case 'This Month':
+      updateRangeToToday(
+        moment()
+          .startOf('month')
+          .toDate()
+      );
+      break;
+    case 'Last Month':
+      updateRangeToToday(
+        moment()
+          .subtract(1, 'months')
+          .toDate()
+      );
+      break;
+    case 'This Year':
+      updateRangeToToday(
+        moment()
+          .startOf('years')
+          .toDate()
+      );
+      break;
+    case 'Lifetime':
+      updateRangeToToday(moment(store.getState().lifeTime).toDate());
+      break;
+    default:
+  }
   return {
-    type: TOGGLE_POP_UP
+    type: SET_SNIPPET,
+    payload
   };
 };
