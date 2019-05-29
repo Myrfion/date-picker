@@ -1,3 +1,3 @@
-import RangeList from "./range-list";
+import RangeList from './range-list';
 
 export default RangeList;

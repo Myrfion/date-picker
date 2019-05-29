@@ -1,8 +1,19 @@
-.calendars-container{
-    display: flex;
+.calendars-container {
+  display: flex;
 }
-.buttons-container{
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+.default-btn {
+  background: white;
+  border: none;
+}
+.apply-btn {
+  color: #f7ad17;
+  font-weight: bold;
+  margin-right: 20px;
+}
+.clean-btn {
 }
